@@ -3,6 +3,8 @@ public class Ship {
     private int currFilling;
     private Type type;
 
+//    public Ship(){}
+
     public Ship(int capacity, Type type) {
         this.capacity = capacity;
         this.type = type;
@@ -13,9 +15,9 @@ public class Ship {
         return capacity;
     }
 
-    public int getCurrFilling() {
-        return currFilling;
-    }
+//    public int getCurrFilling() {
+//        return currFilling;
+//    }
 
     public Type getType() {
         return type;
@@ -27,6 +29,10 @@ public class Ship {
 
     public String toString(){
         return "Ship <" + type + ", " + capacity + ", " + currFilling + ">";
+    }
+
+    public void goToChannel(Channel channel){
+        channel.getNewShip(this);
     }
 
     public enum Type{

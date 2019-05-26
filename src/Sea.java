@@ -1,10 +1,24 @@
 public class Sea {
 
     public Ship generateRandomShip(){
+        int capacity;
+        Ship.Type type;
         double random = Math.random() * 100;
-        int capacity = random < 10 ? 10 : random < 50 ? 50 : 100;
+        if (random < 10){
+            capacity = 10;
+        } else if (random < 50){
+            capacity = 50;
+        } else {
+            capacity = 100;
+        }
         double random2 = Math.random() * 3;
-        Ship.Type type = random2 < 1 ? Ship.Type.A : random2 < 2 ? Ship.Type.B : Ship.Type.C;
+        if (random2 < 1) {
+            type = Ship.Type.A;
+        } else if (random2 < 2) {
+            type = Ship.Type.B;
+        } else {
+            type = Ship.Type.C;
+        }
         return new Ship(capacity, type);
     }
 }
