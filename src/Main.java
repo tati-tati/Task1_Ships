@@ -14,10 +14,7 @@ public class Main {
         // 3 thread for each dock's working
         for (int i = 0; i < 3; i++){
             Ship.Type type = i == 0 ? Ship.Type.A : i == 1 ? Ship.Type.B : Ship.Type.C;
-            new Thread(() -> {
-                System.out.println("New thread is invoked : " + Thread.currentThread().getName());
-                new Dock(type).setChannel(channel).run();
-            }).start();
+            new Dock(type).setChannel(channel).start();
         }
     }
 }
