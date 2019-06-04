@@ -1,7 +1,7 @@
-public class Dock {
+public class Dock implements Runnable {
     private final int VELOCITY_IN_SECOND = 10;
     private Ship.Type type;
-    private volatile boolean isBusy = false;
+    private Channel channel;
 
     public Dock(Ship.Type type) {
         this.type = type;
@@ -11,46 +11,34 @@ public class Dock {
         return type;
     }
 
-
-
-//    public synchronized void getShip(Ship ship){
-//        isBusy = true;
-//        System.out.println("Current thread : " + Thread.currentThread().getName() +
-//                "Dock : " + this.toString() + " " +
-//                "Got new ship : " + ship.toString());
-//        int shipCapacity = ship.getCapacity() - ship.getCurrFilling();
-//        for (int i = 0 ; i < shipCapacity/VELOCITY_IN_SECOND; i++){
-//            ship.setCurrFilling(VELOCITY_IN_SECOND);
-//        }
-//        isBusy = false;
-//        System.out.println("Dock : " + this.toString() + " " +
-//                "Let ship go : " + ship.toString());
-////         notifyAll();
-//    }
-
     public String toString(){
-        return "Dock <" + type + ", " + isBusy + ">";
+        return "Dock <" + type + ">";
     }
 
-    public void getShip(Channel channel){
+    public Dock setChannel(Channel channel){
+        this.channel = channel;
+        return this;
+    }
+
+    @Override
+    public void run() {
         while (true){
-            Ship ship = channel.sendNewShip(getType());
+            Ship ship = channel.shipIsLeaving(getType());
             if (ship != null){
-                System.out.println("Current thread : " +
-                        Thread.currentThread().getName() +
-                        "Dock : " + toString() + " " +
-                        "Got new ship : " + ship.toString());
+                System.out.println(toString() + " get " + ship.toString() +
+                        " thread : " +
+                        Thread.currentThread().getName());
                 try {
                     Thread.sleep(ship.getCapacity() / VELOCITY_IN_SECOND * 1000);
                     ship.setCurrFilling(ship.getCapacity());
-                    System.out.println("Dock : " + toString() + " " +
-                            "Let ship go : " + ship.toString());
+                    System.out.println(toString() + " let go " + ship.toString() + " thread : " +
+                            Thread.currentThread().getName());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             } else {
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
