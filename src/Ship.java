@@ -1,23 +1,17 @@
-public class Ship {
+public class Ship implements Runnable{
     private int capacity;
-    private int currFilling;
+    private int currFilling = 0;
     private Type type;
-
-//    public Ship(){}
+    private Channel channel;
 
     public Ship(int capacity, Type type) {
         this.capacity = capacity;
         this.type = type;
-        this.currFilling = 0;
     }
 
     public int getCapacity() {
         return capacity;
     }
-
-//    public int getCurrFilling() {
-//        return currFilling;
-//    }
 
     public Type getType() {
         return type;
@@ -31,8 +25,14 @@ public class Ship {
         return "Ship <" + type + ", " + capacity + ", " + currFilling + ">";
     }
 
-    public void goToChannel(Channel channel){
-        channel.getNewShip(this);
+    @Override
+    public void run() {
+        channel.shipIsArriving(this);
+    }
+
+    public Ship setChannel(Channel channel) {
+        this.channel = channel;
+        return this;
     }
 
     public enum Type{
