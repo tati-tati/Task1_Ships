@@ -1,57 +1,46 @@
 //import java.util.Map;
 //import java.util.Stack;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 public class Channel {
-    public final int MAX_CAPACITY = 5;
-//    private Stack<Thread> stack = new Stack<>();
-    private LinkedBlockingQueue<Ship> queue;
+    private static final int MAX_CAPACITY = 5;
+    private Semaphore semaphore = new Semaphore(MAX_CAPACITY, true);
+    private final List<Ship> list = new ArrayList<>(MAX_CAPACITY);
 
-    public Channel() {
-        this.queue = new LinkedBlockingQueue<>(MAX_CAPACITY);
-    }
-
-//    public void openChannel(Sea sea, Map<Ship.Type, Dock> dockMap) {
-//        while (stack.size() < MAX_CAPACITY) {
-//            Ship ship = sea.generateRandomShip();
-//            System.out.println("New Ship was added : " + ship.toString() + " for the thread : " + Thread.currentThread().getName());
-//            stack.push(new Thread(() -> {
-//                        Dock dock = dockMap.get(ship.getType());
-//                        dock.getShip(ship);
-//                        stack.removeElementAt(stack.indexOf(Thread.currentThread()));
-//                        this.openChannel(sea, dockMap);
-//                    })
-//            ).start();
-//        }
-//    }
-
-//    public int getCurrentSize(){
-//        return queue.size();
-//    }
-
-//    public boolean isEmpty(){
-//        return queue.isEmpty();
-//    }
-
-    public void getNewShip(Ship ship){
-        if (queue.size() < MAX_CAPACITY){
-            queue.add(ship);
-            System.out.println("New Ship was added : " + ship.toString() + " for the thread : " + Thread.currentThread().getName());
+    public void shipIsArriving(Ship ship){
+        try {
+            semaphore.acquire();
+            synchronized (list){
+                if (list.size() < MAX_CAPACITY){
+                    list.add(ship);
+                    System.out.println( list.size() + " " + ship.toString() + " was added");
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
-    public Ship sendNewShip(Ship.Type type){
+    public Ship shipIsLeaving(Ship.Type type) {
         Ship ship = null;
-        Ship[] ships = queue.toArray(new Ship[]{});
-        for (int i = 0; i < ships.length; i++){
-            if (ships[i].getType() == type){
-                ship = ships[i];
-                i = ships.length;
+        if (list.size() > 0) {
+            Ship[] ships = list.toArray(new Ship[]{});
+            for (int i = 0; i < ships.length; i++) {
+                if (ships[i].getType() == type) {
+                    ship = ships[i];
+                    i = ships.length;
+                }
             }
         }
-        if (ship != null){
-            queue.remove(ship);
+        if (ship != null) {
+            list.remove(ship);
+            System.out.println( list.size() + " " + ship.toString() + " was deleted");
+            semaphore.release();
+//            System.out.println( list.size() + " current queue size");
         }
         return ship;
     }
+
 }
